@@ -5,6 +5,52 @@
     <title>Title</title>
 </head>
 <body>
+<script type="module">
+    import {DynamicStorage} from "../../dist/storage/localStorage.js";
 
+    const storage1 = new DynamicStorage("login", "userInfo");
+    storage1.set({
+        zyy: "大傻逼"
+    });
+    console.log(storage1.get());
+    storage1.add({
+        "dasb": 123
+    });
+    console.log(storage1.get());
+    const storage2 = new DynamicStorage("login", "userInfo12");
+    storage2.set(new Map([
+        ["Song 1", "http://example.com/song1.mp3"],
+        ["Song 2", "http://example.com/song2.mp3"],
+        ["Song 3", "http://example.com/song3.mp3"]
+    ]));
+    console.log(storage2.get());
+    storage2.add(new Map([["Song 4", "123456789"]]));
+    storage2.add({"Song 5": "123456789"});
+    console.log(storage2.get());
+    const storage3 = new DynamicStorage("login", "userInfo1222");
+    storage3.set([1, 2,3 ,4 ,5 ,6]);
+    console.log(storage3.get());
+    storage3.add(123)
+    console.log(storage3.get());
+    const storage4 = new DynamicStorage("login", "userInfo122212");
+    console.log(storage4.get());
+    console.log(storage4.add({"Song 5": "123456789"}));
+
+    console.log("删除")
+    storage1.remove()
+    console.log(storage1.get())
+
+    console.log("分key")
+    const storage5 = new DynamicStorage("login");
+    storage5.set({
+        zyy: "大傻逼"
+    }, "!!")
+    console.log(storage5.get("!!"))
+    storage5.add({
+        fuck: "you"
+    }, "!!")
+    console.log(storage5.get("!!"))
+
+</script>
 </body>
 </html>
