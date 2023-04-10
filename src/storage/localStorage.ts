@@ -18,7 +18,7 @@ interface SetConfig {
 
 export class DynamicStorage {
   LS = window.localStorage;
-  #fm: FmStorage = {
+  private fm: FmStorage = {
     __type__: "",
     __value__: "",
     __dir__: ["__type__", "__value__", "__dir__"]
@@ -72,7 +72,7 @@ export class DynamicStorage {
         if (data instanceof Map) {
           keyValues = Array.from(data.entries());
         } else {
-          keyValues = Object.entries(data as object);
+          keyValues = Object.entries(data as Object);
         }
         for (const [k, v] of keyValues) {
           storage.set(k, v);
@@ -125,9 +125,9 @@ export class DynamicStorage {
     return `${this.name}:${key}`;
   }
 
-  #transverter(value: StorageValue, ignore = false): FmStorage {
+  private transverter(value: StorageValue, ignore = false): FmStorage {
     let storage: FmStorage = {
-      ...this.#fm,
+      ...this.fm,
       __type__: typeof value
     };
     // 特殊存储类型数据解析处理
@@ -156,7 +156,7 @@ export class DynamicStorage {
     return storage;
   }
 
-  #resolver(source: string, original = false): FmStorage | unknown {
+  private resolver(source: string, original = false): FmStorage | unknown {
     if (original) {
       return JSON.parse(source) as FmStorage;
     }
@@ -166,11 +166,11 @@ export class DynamicStorage {
 
     switch (__type__) {
       case "map":
-        const storage = this.#removeSpecial(fStorage, __dir__);
+        const storage = this.removeSpecial(fStorage, __dir__);
         return new Map(Object.entries(storage));
 
       case "object":
-        return this.#removeSpecial(fStorage, __dir__);
+        return this.removeSpecial(fStorage, __dir__);
 
       default:
         return __value__;
@@ -178,7 +178,7 @@ export class DynamicStorage {
   }
 
   // 辅助方法：去除内置特殊属性
-  #removeSpecial(storage: FmStorage, dir: string[]) {
+  removeSpecial(storage: FmStorage, dir: string[]) {
     if (storage.constructor === Object) {
       // 去除内置特殊属性
       for (const inlay of dir) {
@@ -189,7 +189,7 @@ export class DynamicStorage {
   }
 
   load(value: StorageValue) {
-    return this.#transverter(value);
+    return this.transverter(value);
   }
 
   parse(source?: string | null) {
@@ -197,7 +197,7 @@ export class DynamicStorage {
       return source;
     }
     try {
-      return this.#resolver(source);
+      return this.resolver(source);
     } catch {
       console.error("Json解析异常");
     }

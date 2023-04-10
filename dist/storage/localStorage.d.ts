@@ -1,5 +1,5 @@
-type MapValue = Map<string | number, any>;
-type StorageValue = string | number | object | any[] | MapValue;
+declare type MapValue = Map<string | number, any>;
+declare type StorageValue = string | number | object | any[] | MapValue;
 interface FmStorage {
     [key: string]: any;
     __type__: string;
@@ -11,10 +11,10 @@ interface SetConfig {
     ignore?: boolean;
 }
 export declare class DynamicStorage {
-    #private;
     private readonly name;
     key?: string | undefined;
     LS: Storage;
+    private fm;
     constructor(name: string, key?: string | undefined);
     get(key?: string): any;
     set(value: StorageValue, key?: string, { beforeStorage, ignore }?: SetConfig): void;
@@ -22,6 +22,9 @@ export declare class DynamicStorage {
     add<T = unknown>(data: T, key?: string): void;
     pop<T = unknown>(index: T, key?: string): void;
     getKey(key?: string, warn?: boolean): string;
+    private transverter;
+    private resolver;
+    removeSpecial(storage: FmStorage, dir: string[]): FmStorage;
     load(value: StorageValue): FmStorage;
     parse(source?: string | null): unknown;
 }

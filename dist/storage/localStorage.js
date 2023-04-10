@@ -3,7 +3,7 @@ export class DynamicStorage {
     name;
     key;
     LS = window.localStorage;
-    #fm = {
+    fm = {
         __type__: "",
         __value__: "",
         __dir__: ["__type__", "__value__", "__dir__"]
@@ -85,9 +85,9 @@ export class DynamicStorage {
         }
         return `${this.name}:${key}`;
     }
-    #transverter(value, ignore = false) {
+    transverter(value, ignore = false) {
         let storage = {
-            ...this.#fm,
+            ...this.fm,
             __type__: typeof value
         };
         switch (true) {
@@ -109,7 +109,7 @@ export class DynamicStorage {
         }
         return storage;
     }
-    #resolver(source, original = false) {
+    resolver(source, original = false) {
         if (original) {
             return JSON.parse(source);
         }
@@ -117,15 +117,15 @@ export class DynamicStorage {
         const { __type__, __value__, __dir__ } = fStorage;
         switch (__type__) {
             case "map":
-                const storage = this.#removeSpecial(fStorage, __dir__);
+                const storage = this.removeSpecial(fStorage, __dir__);
                 return new Map(Object.entries(storage));
             case "object":
-                return this.#removeSpecial(fStorage, __dir__);
+                return this.removeSpecial(fStorage, __dir__);
             default:
                 return __value__;
         }
     }
-    #removeSpecial(storage, dir) {
+    removeSpecial(storage, dir) {
         if (storage.constructor === Object) {
             for (const inlay of dir) {
                 delete storage[inlay];
@@ -134,14 +134,14 @@ export class DynamicStorage {
         return storage;
     }
     load(value) {
-        return this.#transverter(value);
+        return this.transverter(value);
     }
     parse(source) {
         if (!source) {
             return source;
         }
         try {
-            return this.#resolver(source);
+            return this.resolver(source);
         }
         catch {
             console.error("Json解析异常");
