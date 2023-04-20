@@ -1,27 +1,36 @@
 "use strict";
 export class DynamicStorage {
-    name;
-    key;
-    LS = window.localStorage;
-    fm = {
-        __type__: "",
-        __value__: "",
-        __dir__: ["__type__", "__value__", "__dir__"]
-    };
-    constructor(name, key) {
+    constructor(name, { key, encode, decode } = {}) {
+        this.name = name;
+        this.LS = window.localStorage;
+        this.fm = {
+            __type__: "",
+            __value__: "",
+            __dir__: ["__type__", "__value__", "__dir__"]
+        };
         this.name = name;
         this.key = key;
-        this.name = name;
-        this.key = key;
+        if (encode && decode) {
+            this.encode = encode;
+            this.decode = decode;
+        }
+        else if (encode !== null && encode !== void 0 ? encode : decode) {
+            console.warn("使用编码或解码功能，两者必须同时指定执行体");
+        }
+    }
+    has(key) {
+        return this.get(key) !== null;
     }
     get(key) {
-        const storage = this.LS.getItem(this.getKey(key));
+        let storage = this.LS.getItem(this.getKey(key));
+        this.decode && storage && (storage = this.decode(storage));
         return this.parse(storage);
     }
     set(value, key, { beforeStorage, ignore = false } = {}) {
         const fkey = this.getKey(key);
-        const storage = JSON.stringify(!ignore ? this.load(value) : value);
+        let storage = JSON.stringify(!ignore ? this.load(value) : value);
         beforeStorage && beforeStorage(fkey, storage);
+        this.encode && (storage = this.encode(storage));
         this.LS.setItem(fkey, storage);
     }
     remove(key) {
@@ -33,10 +42,10 @@ export class DynamicStorage {
             return console.warn(`请先使用set方法存储数据`);
         }
         switch (true) {
-            case storage?.constructor === Object:
+            case (storage === null || storage === void 0 ? void 0 : storage.constructor) === Object:
                 Object.assign(storage, data);
                 break;
-            case storage?.constructor === Map:
+            case (storage === null || storage === void 0 ? void 0 : storage.constructor) === Map:
                 let keyValues = [];
                 if (data instanceof Map) {
                     keyValues = Array.from(data.entries());
@@ -62,10 +71,10 @@ export class DynamicStorage {
             return console.warn(`请先使用set方法存储数据`);
         }
         switch (true) {
-            case storage?.constructor === Object:
+            case (storage === null || storage === void 0 ? void 0 : storage.constructor) === Object:
                 delete storage[index];
                 break;
-            case storage?.constructor === Map:
+            case (storage === null || storage === void 0 ? void 0 : storage.constructor) === Map:
                 storage.delete(index);
                 break;
             case Array.isArray(storage):
@@ -86,10 +95,7 @@ export class DynamicStorage {
         return `${this.name}:${key}`;
     }
     transverter(value, ignore = false) {
-        let storage = {
-            ...this.fm,
-            __type__: typeof value
-        };
+        let storage = Object.assign(Object.assign({}, this.fm), { __type__: typeof value });
         switch (true) {
             case value.constructor === Map:
                 storage.__type__ = "map";
@@ -98,7 +104,7 @@ export class DynamicStorage {
                 }
                 break;
             case value.constructor === Object:
-                storage = { ...storage, ...value };
+                storage = Object.assign(Object.assign({}, storage), value);
                 break;
             case value.constructor === Array:
                 storage.__type__ = "array";
@@ -143,7 +149,7 @@ export class DynamicStorage {
         try {
             return this.resolver(source);
         }
-        catch {
+        catch (_a) {
             console.error("Json解析异常");
         }
     }

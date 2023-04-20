@@ -6,16 +6,24 @@ interface FmStorage {
     __value__?: unknown;
     __dir__: string[];
 }
+interface DynamicStorageConfig {
+    key?: string;
+    encode?: Function;
+    decode?: Function;
+}
 interface SetConfig {
     beforeStorage?: Function;
     ignore?: boolean;
 }
 export declare class DynamicStorage {
     private readonly name;
-    key?: string | undefined;
+    key: string | undefined;
+    encode: Function | undefined;
+    decode: Function | undefined;
     LS: Storage;
     private fm;
-    constructor(name: string, key?: string | undefined);
+    constructor(name: string, { key, encode, decode }?: DynamicStorageConfig);
+    has(key?: string): boolean;
     get(key?: string): any;
     set(value: StorageValue, key?: string, { beforeStorage, ignore }?: SetConfig): void;
     remove(key?: string): void;

@@ -11,12 +11,22 @@ interface FmStorage {
   __dir__: string[];
 }
 
+interface DynamicStorageConfig {
+  key?: string;
+  encode?: Function;
+  decode?: Function;
+}
+
 interface SetConfig {
   beforeStorage?: Function;
   ignore?: boolean;
 }
 
 export class DynamicStorage {
+  public key;
+  public encode;
+  public decode;
+
   LS = window.localStorage;
   private fm: FmStorage = {
     __type__: "",
@@ -26,14 +36,27 @@ export class DynamicStorage {
 
   constructor(
     private readonly name: string,
-    public key?: string
+    {key, encode, decode}: DynamicStorageConfig = {}
   ) {
     this.name = name;
     this.key = key;
+
+    if (encode && decode) {
+      this.encode = encode;
+      this.decode = decode;
+    } else if (encode ?? decode) {
+      console.warn("使用编码或解码功能，两者必须同时指定执行体")
+    }
+  }
+
+  has(key?: string): boolean {
+    return this.get(key) !== null;
   }
 
   get(key?: string): any {
-    const storage = this.LS.getItem(this.getKey(key));
+    let storage = this.LS.getItem(this.getKey(key));
+    // 解码存在则使用解码
+    this.decode && storage && (storage = this.decode(storage))
     return this.parse(storage);
   }
 
@@ -42,12 +65,13 @@ export class DynamicStorage {
     {beforeStorage, ignore = false}: SetConfig = {}
   ) {
     const fkey = this.getKey(key);
-    const storage = JSON.stringify(!ignore ? this.load(value) : value);
+    let storage = JSON.stringify(!ignore ? this.load(value) : value);
 
     // 存储之前钩子
     beforeStorage && beforeStorage(fkey, storage);
     // 存储之前检查
-    // TODO: 存储之前做的检查暂时没想到
+    // 解码存在则使用解码
+    this.encode && (storage = this.encode(storage))
     this.LS.setItem(fkey, storage);
   }
 
