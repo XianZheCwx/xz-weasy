@@ -1,7 +1,7 @@
 "use strict";
 import { dynamicStorage } from "../storage/storage";
-export class lDynamicStorage extends dynamicStorage {
+export class sDynamicStorage extends dynamicStorage {
     constructor(...args) {
-        super(window.localStorage, ...args);
+        super(window.sessionStorage, ...args);
     }
 }
