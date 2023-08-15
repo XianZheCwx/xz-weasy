@@ -22,7 +22,7 @@ interface SetConfig {
   ignore?: boolean;
 }
 
-export class dynamicStorage {
+export class DynamicStorage {
   public key;
   public encode;
   public decode;
@@ -33,15 +33,15 @@ export class dynamicStorage {
   };
 
   constructor(
-    readonly LS: Storage,
+    readonly Storage: Storage,
     private readonly name: string,
     {key, encode, decode}: DynamicStorageConfig = {}
   ) {
-    if (![window.localStorage, window.sessionStorage].includes(LS)) {
+    if (![window.localStorage, window.sessionStorage].includes(Storage)) {
       throw TypeError(`使用${this.constructor.name}类实例LS参数必须要传入Storage类型`);
     }
 
-    this.LS = LS;
+    this.Storage = Storage;
     this.name = name;
     this.key = key;
 
@@ -58,7 +58,7 @@ export class dynamicStorage {
   }
 
   get(key?: string): any {
-    let storage = this.LS.getItem(this.getKey(key));
+    let storage = this.Storage.getItem(this.getKey(key));
     // 解码存在则使用解码
     this.decode && storage && (storage = this.decode(storage));
     return this.parse(storage);
@@ -76,11 +76,11 @@ export class dynamicStorage {
     // 存储之前检查
     // 解码存在则使用解码
     this.encode && (storage = this.encode(storage));
-    this.LS.setItem(fkey, storage);
+    this.Storage.setItem(fkey, storage);
   }
 
   remove(key?: string) {
-    this.LS.removeItem(this.getKey(key));
+    this.Storage.removeItem(this.getKey(key));
   }
 
   add<T = unknown>(data: T, key?: string) {

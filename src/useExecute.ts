@@ -12,12 +12,11 @@ function __cycleExecute(
   func: ExeFunc
 ) {
   const $route = useRoute();
-  let instance = () => (cachedEffect(() => {func();}));
-  // 不被缓存或为携带参数页时转化为不缓存副作用
-  if ($route.meta.uncached || Object.keys($route.query).length !== 0) {
-    instance = () => uncachedEffect(() => {func();});
+  let instance = () => uncachedEffect(() => {func();});
+  // 不被缓存且不携带query参数时转化为不缓存副作用
+  if ($route.meta.cached && Object.keys($route.query).length === 0) {
+    instance = () => (cachedEffect(() => {func();}));
   }
-  console.log("instance", instance(), instance, cachedEffect);
   return instance;
 }
 

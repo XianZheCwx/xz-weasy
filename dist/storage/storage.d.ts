@@ -1,5 +1,5 @@
-type MapValue = Map<string | number, any>;
-type StorageValue = string | number | object | any[] | MapValue;
+declare type MapValue = Map<string | number, any>;
+declare type StorageValue = string | number | object | any[] | MapValue;
 interface FmStorage {
     [key: string]: any;
     __type__: string;
@@ -15,14 +15,14 @@ interface SetConfig {
     beforeStorage?: Function;
     ignore?: boolean;
 }
-export declare class dynamicStorage {
-    readonly LS: Storage;
+export declare class DynamicStorage {
+    readonly Storage: Storage;
     private readonly name;
     key: string | undefined;
     encode: Function | undefined;
     decode: Function | undefined;
     private fm;
-    constructor(LS: Storage, name: string, { key, encode, decode }?: DynamicStorageConfig);
+    constructor(Storage: Storage, name: string, { key, encode, decode }?: DynamicStorageConfig);
     has(key?: string): boolean;
     get(key?: string): any;
     set(value: StorageValue, key?: string, { beforeStorage, ignore }?: SetConfig): void;

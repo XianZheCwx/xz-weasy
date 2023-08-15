@@ -1,6 +1,6 @@
 "use strict";
-import { dynamicStorage } from "../storage/storage";
-export class sDynamicStorage extends dynamicStorage {
+import { DynamicStorage } from "@/storage/storage";
+export class DynamicSStorage extends DynamicStorage {
     constructor(...args) {
         super(window.sessionStorage, ...args);
     }

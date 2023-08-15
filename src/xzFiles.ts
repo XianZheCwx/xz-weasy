@@ -87,25 +87,30 @@ export async function downloadFile(file: FileType | string, ...args: any[]) {
  * @return {Promise<unknown>}
  */
 export function poller<T = unknown>(
-  {fn, failFn, meta, interval = 300, timeout = 3000}: Poller.Args
+  { fn, failFn, meta, interval = 300, timeout = 3000 }: Poller.Args
 ): Promise<T> {
-  let _Succ_State = false;
-  let _Fail_State = false;
   // 起始时间戳
   const startTimeStamp = (new Date()).getTime();
+  // 轮询结束上下文
+  const overCtx: Record<string, unknown> = {};
+  let _Succ_State = false, _Fail_State = false, count = 0;
   // 触发轮询成功执行体
-  const success = () => {
+  const success = (successMeta?: unknown) => {
     _Succ_State = true;
+    successMeta && (overCtx.successMeta = successMeta);
   };
   // 触发轮询失败执行体
-  const fail = () => {
+  const fail = (failMeta?: unknown) => {
     _Fail_State = true;
+    failMeta && (overCtx.failMeta = failMeta);
   };
 
   return new Promise((resolve, reject) => {
     // 定时器对象
     const timerObj = window.setInterval(async () => {
       const msg = await fn(success, fail, meta);
+      count++;
+
       if (_Succ_State) {
         // 结束定时器线程
         clearInterval(timerObj);
@@ -116,7 +121,7 @@ export function poller<T = unknown>(
         // 结束定时器线程
         clearInterval(timerObj);
         if (failFn) {
-          const msg = failFn(meta);
+          const msg = failFn(meta, { ...overCtx, count });
           return resolve(msg as T);
         }
         // 未指定错误回调情况下抛出异常
@@ -124,4 +129,25 @@ export function poller<T = unknown>(
       }
     }, interval);
   });
+}
+
+/**
+ * 图片转Base64辅助函数
+ * @param src 图片地址
+ * @return {Promise<string>} base64字符串
+ */
+export async function imgToBase64(src: string) {
+  const img = new Image();
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+  img.src = src;
+  await new Promise<void>(resolve => {
+    img.addEventListener("load", () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      resolve();
+    });
+  });
+  ctx?.drawImage(img, 0, 0);
+  return canvas.toDataURL("image/*", 1);
 }

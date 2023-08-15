@@ -1,8 +1,8 @@
 "use strict";
-import {dynamicStorage} from "@/storage/storage";
+import {DynamicStorage} from "@/storage/storage";
 import type {DynamicStorageConfig} from "@/storage/storage";
 
-export class lDynamicStorage extends dynamicStorage {
+export class DynamicLStorage extends DynamicStorage {
   constructor(...args: [string, DynamicStorageConfig]) {
     super(window.localStorage, ...args);
   }

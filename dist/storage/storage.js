@@ -1,6 +1,6 @@
 "use strict";
-export class dynamicStorage {
-    LS;
+export class DynamicStorage {
+    Storage;
     name;
     key;
     encode;
@@ -10,13 +10,13 @@ export class dynamicStorage {
         __value__: "",
         __dir__: ["__type__", "__value__", "__dir__"]
     };
-    constructor(LS, name, { key, encode, decode } = {}) {
-        this.LS = LS;
+    constructor(Storage, name, { key, encode, decode } = {}) {
+        this.Storage = Storage;
         this.name = name;
-        if (![window.localStorage, window.sessionStorage].includes(LS)) {
+        if (![window.localStorage, window.sessionStorage].includes(Storage)) {
             throw TypeError(`使用${this.constructor.name}类实例LS参数必须要传入Storage类型`);
         }
-        this.LS = LS;
+        this.Storage = Storage;
         this.name = name;
         this.key = key;
         if (encode && decode) {
@@ -31,7 +31,7 @@ export class dynamicStorage {
         return this.get(key) !== null;
     }
     get(key) {
-        let storage = this.LS.getItem(this.getKey(key));
+        let storage = this.Storage.getItem(this.getKey(key));
         this.decode && storage && (storage = this.decode(storage));
         return this.parse(storage);
     }
@@ -40,10 +40,10 @@ export class dynamicStorage {
         let storage = JSON.stringify(!ignore ? this.load(value) : value);
         beforeStorage && beforeStorage(fkey, storage);
         this.encode && (storage = this.encode(storage));
-        this.LS.setItem(fkey, storage);
+        this.Storage.setItem(fkey, storage);
     }
     remove(key) {
-        this.LS.removeItem(this.getKey(key));
+        this.Storage.removeItem(this.getKey(key));
     }
     add(data, key) {
         const storage = this.get(key);

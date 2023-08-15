@@ -6,9 +6,9 @@
 </head>
 <body>
 <script type="module">
-    import {DynamicStorage} from "../../dist/storage/localStorage.js";
+    import {DynamicLStorage} from "../../dist/storage/localStorage.js";
 
-    const storage1 = new DynamicStorage("login", {key: "userInfo"});
+    const storage1 = new DynamicLStorage("login", {key: "userInfo"});
     storage1.set({
         zyy: "大傻逼"
     });
@@ -17,7 +17,7 @@
         "dasb": 123
     });
     console.log(storage1.get());
-    const storage2 = new DynamicStorage("login", {key: "userInfo12"});
+    const storage2 = new DynamicLStorage("login", {key: "userInfo12"});
     storage2.set(new Map([
         ["Song 1", "http://example.com/song1.mp3"],
         ["Song 2", "http://example.com/song2.mp3"],
@@ -27,12 +27,12 @@
     storage2.add(new Map([["Song 4", "123456789"]]));
     storage2.add({"Song 5": "123456789"});
     console.log(storage2.get());
-    const storage3 = new DynamicStorage("login", {key: "userInfo1222"});
+    const storage3 = new DynamicLStorage("login", {key: "userInfo1222"});
     storage3.set([1, 2,3 ,4 ,5 ,6]);
     console.log(storage3.get());
     storage3.add(123)
     console.log(storage3.get());
-    const storage4 = new DynamicStorage("login", {key: "userInfo122212"});
+    const storage4 = new DynamicLStorage("login", {key: "userInfo122212"});
     console.log(storage4.get());
     console.log(storage4.add({"Song 5": "123456789"}));
 
@@ -43,7 +43,7 @@
     console.log(storage1.has())
 
     console.log("分key")
-    const storage5 = new DynamicStorage("login");
+    const storage5 = new DynamicLStorage("login");
     storage5.set({
         zyy: "大傻逼"
     }, "!!")

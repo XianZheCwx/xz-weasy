@@ -2,11 +2,10 @@ import { onMounted, onActivated, onUnmounted, onDeactivated } from "vue";
 import { useRoute } from "vue-router";
 function __cycleExecute(cachedEffect, uncachedEffect, func) {
     const $route = useRoute();
-    let instance = () => (cachedEffect(() => { func(); }));
-    if ($route.meta.uncached || Object.keys($route.query).length !== 0) {
-        instance = () => uncachedEffect(() => { func(); });
+    let instance = () => uncachedEffect(() => { func(); });
+    if ($route.meta.cached && Object.keys($route.query).length === 0) {
+        instance = () => (cachedEffect(() => { func(); }));
     }
-    console.log("instance", instance(), instance, cachedEffect);
     return instance;
 }
 export function useMain(func, execute = true) {
